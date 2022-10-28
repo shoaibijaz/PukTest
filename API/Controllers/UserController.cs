@@ -51,7 +51,14 @@ namespace API.Controllers
         public async Task<ActionResult<Result<int>>> CreateUser([FromBody] UserDto user)
         {
            
-           return await _repository.AddUpdate(user);
+           return await _repository.AddNew(user);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(typeof(Result<int>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDto value)
+        {
+            return Ok(await _repository.Update(value));
         }
 
         [HttpDelete("{id}")]

@@ -16,10 +16,11 @@ interface Props {
     createOrEdit: (user: User) => void;
     deleteUser: (id: number) => void;
     suspendUser: (suspend: boolean, id:number) => void;
+    submitting:boolean,
 }
 
 export default function UserDashboard({ users, selectedUser,
-    selectUser, cancelSelectUser, editMode, openForm, closeForm, createOrEdit, deleteUser, suspendUser }: Props) {
+    selectUser, cancelSelectUser, editMode, openForm, closeForm, createOrEdit, deleteUser, suspendUser, submitting }: Props) {
     return (
         <Grid>
            <Grid.Column width='10'>
@@ -27,6 +28,7 @@ export default function UserDashboard({ users, selectedUser,
                     selectUser={selectUser}
                     deleteUser={deleteUser}
                     suspendUser={suspendUser}
+                    submitting={submitting}
                 />
             </Grid.Column>
              <Grid.Column width='6'>
@@ -37,7 +39,11 @@ export default function UserDashboard({ users, selectedUser,
                         openForm={openForm} />
                 }
                 {editMode &&
-                     <UserForm closeForm={closeForm} user={selectedUser} createOrEdit={createOrEdit} />
+                     <UserForm 
+                     closeForm={closeForm} 
+                     user={selectedUser} 
+                     createOrEdit={createOrEdit}
+                     submitting={submitting} />
                     }
 
             </Grid.Column> 

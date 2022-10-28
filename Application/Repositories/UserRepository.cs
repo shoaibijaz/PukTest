@@ -41,9 +41,14 @@ namespace Application.Repositories
             return await users.ProjectTo<UserDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<Result<int>> AddUpdate(UserDto user)
+        public async Task<Result<int>> AddNew(UserDto user)
         {
-            var validate = await _validator.ValidateAsync(user);
+            var validate = await _validator.ValidateAsync(user, opt=>
+            {
+                opt.IncludeRulesNotInRuleSet();
+                opt.IncludeRuleSets("Password");
+            });
+
             var result = new Result<int>();
 
             if (!validate.IsValid)
@@ -52,9 +57,30 @@ namespace Application.Repositories
             }
             else
             {
-                result = user.Id > 0 ? await _updateUser(user) : await _addNewUser(user);
+                result = await _addNewUser(user);
             }
             
+            return result;
+        }
+
+        public async Task<Result<int>> Update(UserDto user)
+        {
+            var validate = await _validator.ValidateAsync(user, opt =>
+            {
+                opt.IncludeRulesNotInRuleSet();
+                opt.IncludeRuleSets("Id");
+            });
+
+            var result = new Result<int>();
+
+            if (!validate.IsValid)
+            {
+                result = Result<int>.Failure(validate.Errors.Select(a => a.ErrorMessage).ToArray());
+            }
+            else
+            {
+                result = await _updateUser(user);
+            }
 
             return result;
         }
@@ -78,7 +104,8 @@ namespace Application.Repositories
             {
                 UserName = user.Email,
                 Email = user.Email,
-                Name = user.Name
+                Name = user.Name,
+                Suspended = false
             };
 
             var result = await _userManager.CreateAsync(appUser, user.Password);
@@ -95,9 +122,13 @@ namespace Application.Repositories
         {
             var appUser = await _userManager.FindByIdAsync(user.Id.ToString());
 
+            if (appUser == null)
+                return Result<int>.Failure(new string[] { "User not found, Id is not valid" });
+
             appUser.UserName = user.Email;
             appUser.Name = user.Name;
             appUser.Email = user.Email;
+            appUser.Suspended = user.Suspended;
 
             var result = await _userManager.UpdateAsync(appUser);
 

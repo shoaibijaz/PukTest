@@ -6,9 +6,10 @@ interface Props {
    user: User | undefined;
    closeForm: () => void;
    createOrEdit: (user: User) => void;
+   submitting:boolean
 }
 
-export default function UserForm({ user: selectedUser, closeForm, createOrEdit }: Props) {
+export default function UserForm({ user: selectedUser, closeForm, createOrEdit, submitting }: Props) {
     
    const initialState = selectedUser ?? {
       id: 0,
@@ -17,7 +18,7 @@ export default function UserForm({ user: selectedUser, closeForm, createOrEdit }
       password: "",
       lastLogin: new Date(),
       createDate: new Date(),
-      suspended: false
+      suspended:false
    };
 
    const [user, setUser] = useState(initialState);
@@ -41,7 +42,7 @@ export default function UserForm({ user: selectedUser, closeForm, createOrEdit }
             <Form.Input placeholder="Password" value={user.password} name="password" onChange={handleInputChange} />
             }
 
-            <Button floated="right" positive type="submit" content="Submit" />
+            <Button loading={submitting} floated="right" positive type="submit" content="Submit" />
             <Button onClick={closeForm} floated="right" type="button" content="Cancel" />
          </Form>
       </Segment>
