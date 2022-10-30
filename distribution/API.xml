@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API</name>
+    </assembly>
+    <members>
+        <member name="M:API.Controllers.AccountController.Login(Application.DTOs.LoginDto)">
+            <summary>
+            Authenticate the user.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:API.Controllers.AccountController.GetCurrentUser">
+            <summary>
+            Get the current logged-in user details.
+            </summary>
+            
+        </member>
+        <member name="M:API.Controllers.UserController.GetUser">
+            <summary>
+            Get the all users list
+            </summary>
+            
+        </member>
+        <member name="M:API.Controllers.UserController.GetUser(System.Int32)">
+            <summary>
+            Get the single user by ID
+            </summary>
+            
+        </member>
+        <member name="M:API.Controllers.UserController.CreateUser(Application.DTOs.UserDto)">
+            <summary>
+            Create a new user
+            </summary>
+            
+        </member>
+        <member name="M:API.Controllers.UserController.UpdateUser(Application.DTOs.UserDto)">
+            <summary>
+            Update the existing user by ID. Note! password will not update with this request.
+            </summary>
+            
+        </member>
+        <member name="M:API.Controllers.UserController.DeleteUserById(System.Int32)">
+            <summary>
+            Delete the user by ID
+            </summary>
+            
+        </member>
+    </members>
+</doc>

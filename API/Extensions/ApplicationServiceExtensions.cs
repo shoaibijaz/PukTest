@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Persistence;
+using System.Reflection;
 
 namespace API.Extensions
 {
@@ -25,10 +26,12 @@ namespace API.Extensions
                 options.UseSqlServer(connectionString);
             });
 
-            //builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            });
 
             builder.Services.AddCors(opt =>
             {

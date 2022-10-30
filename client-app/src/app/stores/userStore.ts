@@ -8,12 +8,17 @@ export default class UserStore {
     editMode = false;
     loading = false;
     loadingInitial = true;
+    responseErrors =[]
 
     constructor() {
         makeAutoObservable(this)
     }
 
-    loadActivities = async () => {
+    get getUsers() {
+        return Array.from(this.userRegistry.values()).sort(a => a.id);
+    }
+
+    loadUsers = async () => {
         try {
             const activities = await agent.Users.list();
             activities.forEach(user => {
@@ -41,6 +46,7 @@ export default class UserStore {
     openForm = (id?: number) => {
         id ? this.selectUser(id) : this.cancelSelectedUser();
         this.editMode = true;
+        this.responseErrors = [];
     }
 
     closeForm = () => {
@@ -51,12 +57,22 @@ export default class UserStore {
         this.loading = true;
 
         try {
-            await agent.Users.create(user);
+
+            const result = await agent.Users.create(user);
 
             runInAction(() => {
-               // this.userRegistry.set(user.id, user);
-                this.selectedUser = user;
-                this.editMode = false;
+                if (result.isSuccess) {
+                    this.responseErrors = [];
+                    user.id = result.value;
+                    this.userRegistry.set(user.id, user);
+                    this.selectedUser = user;
+                    this.editMode = false;
+                }
+                else{
+                    this.responseErrors = result.errors??[];
+                    console.log(this.responseErrors, result.errors)
+                }
+
                 this.loading = false;
             })
 
@@ -68,15 +84,21 @@ export default class UserStore {
         }
     }
 
-    
     updateUser = async (user: User) => {
         this.loading = true;
         try {
-            await agent.Users.update(user);
+            const result = await agent.Users.update(user);
             runInAction(() => {
-               // this.userRegistry.set(user.id, user);
-                this.selectedUser = user;
-                this.editMode = false;
+                if (result.isSuccess) {
+                    this.responseErrors= [];
+                    this.userRegistry.set(user.id, user);
+                    this.selectedUser = user;
+                    this.editMode = false;
+                } else{
+                    this.responseErrors = result.errors??[];
+                    console.log(this.responseErrors, result.errors)
+                }
+                
                 this.loading = false;
             })
         } catch (error) {
@@ -90,9 +112,9 @@ export default class UserStore {
     deleteUser = async (id: number) => {
         this.loading = true;
         try {
-            await agent.Users.delete(id);
+            const result = await agent.Users.delete(id);
             runInAction(() => {
-                //this.userRegistry.delete(id);
+                if (result.isSuccess) this.userRegistry.delete(id);
                 if (this.selectedUser?.id === id) this.cancelSelectedUser();
                 this.loading = false;
             })

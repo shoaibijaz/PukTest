@@ -1,29 +1,24 @@
+import { observer } from "mobx-react-lite";
 import React, { SyntheticEvent, useState } from "react";
 import { Segment, Item, Button, Label } from "semantic-ui-react";
 import Moment from "moment";
-import { User } from "../../../app/models/user";
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-   users: User[];
-   selectUser: (id: number) => void;
-   deleteUser: (id: number) => void;
-   suspendUser: (suspend: boolean, id: number) => void;
-   submitting:boolean
-}
+export default observer(function ActivityList() {
+   const { userStore } = useStore();
+   const { deleteUser, getUsers, loading } = userStore;
 
-export default function UserList({ users, selectUser, deleteUser, suspendUser, submitting }: Props) {
-
-   const [target, setTarget] = useState('');
+   const [target, setTarget] = useState("");
 
    function handleUserDelete(e: SyntheticEvent<HTMLButtonElement>, id: number) {
-       setTarget(e.currentTarget.name);
-       deleteUser(id);
+      setTarget(e.currentTarget.name);
+      deleteUser(id);
    }
 
    return (
       <Segment>
          <Item.Group divided>
-            {users.map(user => (
+            {getUsers.map(user => (
                <Item key={user.id}>
                   <Item.Content>
                      <Item.Header as="a">
@@ -34,11 +29,11 @@ export default function UserList({ users, selectUser, deleteUser, suspendUser, s
                                  Suspended
                               </Label>
                            )}
-                           {
+                           {!user.suspended && (
                               <Label color="teal" size="mini">
                                  Active
                               </Label>
-                           }
+                           )}
                         </span>
                      </Item.Header>
                      <Item.Meta>{user.email}</Item.Meta>
@@ -48,24 +43,17 @@ export default function UserList({ users, selectUser, deleteUser, suspendUser, s
                         </div>
                      </Item.Description>
                      <Item.Extra>
-                     <Button 
-                                name={user.id} 
-                                loading={submitting && target === user.id.toString()} 
-                                onClick={(e) => handleUserDelete(e, user.id)} 
-                                floated='right' 
-                                content='Delete' 
-                                color='red'
-                                size="small" />
+                        <Button
+                           name={user.id}
+                           loading={loading && target === user.id.toString()}
+                           onClick={e => handleUserDelete(e, user.id)}
+                           floated="right"
+                           content="Delete"
+                           color="red"
+                           size="small"
+                        />
 
-                        <Button onClick={() => deleteUser(user.id)} size="small" floated="right" content="Delete" color="red" />
-                        <Button onClick={() => selectUser(user.id)} size="small" floated="right" content="Edit" color="blue" />
-                        <Button onClick={() => selectUser(user.id)} size="small" floated="right" content="Change Password" color="blue" />
-
-                        {user.suspended && (
-                           <Button onClick={() => suspendUser(false, user.id)} size="small" floated="right" content="Activate" color="green" />
-                        )}
-                        {<Button onClick={() => suspendUser(true, user.id)} size="small" floated="right" content="Suspend" color="yellow" />}
-                        <Button onClick={() => selectUser(user.id)} size="small" floated="right" content="View" color="blue" />
+                        <Button onClick={() => userStore.selectUser(user.id)} size="small" floated="right" content="Edit" color="blue" />
                      </Item.Extra>
                   </Item.Content>
                </Item>
@@ -73,4 +61,4 @@ export default function UserList({ users, selectUser, deleteUser, suspendUser, s
          </Item.Group>
       </Segment>
    );
-}
+});

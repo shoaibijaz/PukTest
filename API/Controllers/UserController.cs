@@ -2,6 +2,7 @@
 using Application.DTOs;
 using Application.Repositories.Interfaces;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -9,6 +10,7 @@ using System.Net;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize()]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -21,6 +23,10 @@ namespace API.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Get the all users list
+        /// </summary>
+        /// 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUser()
@@ -29,6 +35,10 @@ namespace API.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Get the single user by ID
+        /// </summary>
+        /// 
         [HttpGet("{id}", Name = "GetUser")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(UserDto), (int)HttpStatusCode.OK)]
@@ -46,6 +56,10 @@ namespace API.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Create a new user
+        /// </summary>
+        /// 
         [HttpPost]
         [ProducesResponseType(typeof(Result<int>), (int)HttpStatusCode.Created)]
         public async Task<ActionResult<Result<int>>> CreateUser([FromBody] UserDto user)
@@ -54,6 +68,10 @@ namespace API.Controllers
            return await _repository.AddNew(user);
         }
 
+        /// <summary>
+        /// Update the existing user by ID. Note! password will not update with this request.
+        /// </summary>
+        /// 
         [HttpPut]
         [ProducesResponseType(typeof(Result<int>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateUser([FromBody] UserDto value)
@@ -61,6 +79,10 @@ namespace API.Controllers
             return Ok(await _repository.Update(value));
         }
 
+        /// <summary>
+        /// Delete the user by ID
+        /// </summary>
+        /// 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteUserById(int id)
